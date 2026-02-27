@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowUpRight,
   BriefcaseBusiness,
-  Check,
   GraduationCap,
   Mail,
   MapPin,
@@ -23,23 +23,39 @@ const profileOptions = [
   { key: 'database', label: 'Database' }
 ];
 
+// ─── animation constants ─────────────────────────────────────────────────────
+const EASE = [0.25, 0.1, 0.25, 1];
+const SPRING = { type: 'spring', stiffness: 380, damping: 30 };
+
+/** Fade + slide up for scroll-reveal (whileInView) */
+const fadeUp = (delay = 0) => ({
+  initial: { opacity: 0, y: 18 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: '-60px' },
+  transition: { duration: 0.38, ease: EASE, delay }
+});
+
+/** Cross-fade when profile switches — used inside AnimatePresence */
+const SWITCH = {
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -6 },
+  transition: { duration: 0.24, ease: EASE }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 function App() {
   const { personal, featuredProjects, experience, education, awards } = portfolioData;
   const [theme, setTheme] = useState(() => {
-    if (typeof window === 'undefined') {
-      return 'default';
-    }
-
-    const savedTheme = window.localStorage.getItem('portfolio-theme');
-    return themeOptions.some((item) => item.key === savedTheme) ? savedTheme : 'default';
+    if (typeof window === 'undefined') return 'default';
+    const saved = window.localStorage.getItem('portfolio-theme');
+    return themeOptions.some((t) => t.key === saved) ? saved : 'default';
   });
   const [profileFocus, setProfileFocus] = useState(() => {
-    if (typeof window === 'undefined') {
-      return 'backend';
-    }
-
-    const savedFocus = window.localStorage.getItem('portfolio-focus');
-    return profileOptions.some((item) => item.key === savedFocus) ? savedFocus : 'backend';
+    if (typeof window === 'undefined') return 'backend';
+    const saved = window.localStorage.getItem('portfolio-focus');
+    return profileOptions.some((t) => t.key === saved) ? saved : 'backend';
   });
 
   const navItems = [
@@ -116,194 +132,278 @@ function App() {
   return (
     <div className={`app-root theme-${theme} focus-${profileFocus}`}>
       <div className="site-shell">
-      <div className="fx-grid" aria-hidden="true" />
-      <div className="fx-glow fx-glow-a" aria-hidden="true" />
-      <div className="fx-glow fx-glow-b" aria-hidden="true" />
+        <div className="fx-grid" aria-hidden="true" />
+        <div className="fx-glow fx-glow-a" aria-hidden="true" />
+        <div className="fx-glow fx-glow-b" aria-hidden="true" />
 
-      <header className="top-nav">
-        <a href="#top" className="logo-pill">{personal.name}</a>
-        <nav className="main-links">
-          {navItems.map((item) => (
-            <a key={item.href} href={item.href}>{item.label}</a>
-          ))}
-        </nav>
-        <div className="theme-switcher" role="group" aria-label="Style selector">
-          {themeOptions.map((item) => (
-            <button
-              key={item.key}
-              type="button"
-              className={`theme-btn ${theme === item.key ? 'active' : ''}`}
-              onClick={() => setTheme(item.key)}
-              aria-label={item.label}
-              title={item.label}
-            >
-              <span className={`theme-icon theme-icon-${item.key}`} aria-hidden="true" />
-            </button>
-          ))}
-        </div>
-      </header>
-
-      <div className="profile-switcher" role="group" aria-label="Profile focus selector">
-        {profileOptions.map((item) => (
-          <button
-            key={item.key}
-            type="button"
-            className={`profile-btn ${profileFocus === item.key ? 'active' : ''}`}
-            onClick={() => setProfileFocus(item.key)}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
-
-      <main id="top" className="content-wrap">
-        <section className="hero-block">
-          <div className="hero-layout">
-            <div className="hero-main">
-              <p className="eyebrow">{personal.title}</p>
-              <h1>{activeProfile.title}</h1>
-              <p className="hero-copy">{activeProfile.subtitle}</p>
-              <div className="hero-meta">
-                <p><MapPin size={16} /> {personal.location}</p>
-                <p><BriefcaseBusiness size={16} /> {experience[0]?.company}</p>
-              </div>
-
-              <div className="cta-row">
-                <a href="#work" className="btn-primary">View Work</a>
-                <a href="#contact" className="btn-secondary">Contact</a>
-              </div>
-            </div>
-
-            <div className="hero-visual" aria-hidden="true">
-              <img src="/profile.jpg" alt={`${personal.name} profile`} className="profile-image" />
-            </div>
-          </div>
-        </section>
-
-        <section className="grid grid-3 metrics">
-          {activeProfile.stats.map((item) => (
-            <article key={item.value} className="card metric-card">
-              <p className="metric-value">{item.value}</p>
-              <p>{item.label}</p>
-            </article>
-          ))}
-        </section>
-
-        <section id="work" className="section-block">
-          <div className="section-head">
-            <h2>Selected Work</h2>
-          </div>
-          <div className="grid grid-3">
-            {orderedProjects.map((project) => (
-              <article key={project.slug} className="card project-card">
-                <p className="chip">{project.role}</p>
-                <h3>{project.title}</h3>
-                <p>{project.bullets[0]}</p>
-                <ul>
-                  {project.bullets.slice(1).map((bullet) => <li key={bullet}>{bullet}</li>)}
-                </ul>
-                <div className="tag-row">
-                  {project.stack.map((tag) => <span key={tag}>{tag}</span>)}
-                </div>
-              </article>
+        {/* ── HEADER (untouched) ── */}
+        <header className="top-nav">
+          <a href="#top" className="logo-pill">{personal.name}</a>
+          <nav className="main-links">
+            {navItems.map((item) => (
+              <a key={item.href} href={item.href}>{item.label}</a>
+            ))}
+          </nav>
+          <div className="theme-switcher" role="group" aria-label="Style selector">
+            {themeOptions.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                className={`theme-btn ${theme === item.key ? 'active' : ''}`}
+                onClick={() => setTheme(item.key)}
+                aria-label={item.label}
+                title={item.label}
+              >
+                <span className={`theme-icon theme-icon-${item.key}`} aria-hidden="true" />
+              </button>
             ))}
           </div>
-        </section>
+        </header>
 
-        <section id="experience" className="section-block split">
-          <article className="card">
-            <div className="section-head">
-              <h2>Experience</h2>
-            </div>
-            <div className="stack">
-              {experience.map((item) => (
-                <div key={`${item.company}-${item.dates}`} className="entry-line">
-                  <p className="chip">{item.dates}</p>
-                  <h3>{item.role}</h3>
-                  <p>{item.company}</p>
-                  <ul>
-                    {item.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
-                  </ul>
+        {/* ── PROFILE SWITCHER with spring pill ── */}
+        <div className="profile-switcher" role="group" aria-label="Profile focus selector">
+          {profileOptions.map((item) => (
+            <motion.button
+              key={item.key}
+              type="button"
+              className={`profile-btn ${profileFocus === item.key ? 'active' : ''}`}
+              onClick={() => setProfileFocus(item.key)}
+              whileTap={{ scale: 0.94 }}
+            >
+              {profileFocus === item.key && (
+                <motion.span
+                  layoutId="profile-pill"
+                  className="profile-pill-bg"
+                  transition={SPRING}
+                />
+              )}
+              <span className="profile-btn-label">{item.label}</span>
+            </motion.button>
+          ))}
+        </div>
+
+        <main id="top" className="content-wrap">
+
+          {/* ── HERO: fade in on load; h1 + subtitle cross-fade on switch ── */}
+          <motion.section
+            className="hero-block"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: EASE }}
+          >
+            <div className="hero-layout">
+              <div className="hero-main">
+                <p className="eyebrow">{personal.title}</p>
+
+                <AnimatePresence mode="wait">
+                  <motion.h1 key={activeProfile.title} {...SWITCH}>
+                    {activeProfile.title}
+                  </motion.h1>
+                </AnimatePresence>
+
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={activeProfile.subtitle}
+                    className="hero-copy"
+                    {...SWITCH}
+                    transition={{ duration: 0.24, ease: EASE, delay: 0.05 }}
+                  >
+                    {activeProfile.subtitle}
+                  </motion.p>
+                </AnimatePresence>
+
+                <div className="hero-meta">
+                  <p><MapPin size={16} /> {personal.location}</p>
+                  <p><BriefcaseBusiness size={16} /> {experience[0]?.company}</p>
                 </div>
-              ))}
-            </div>
-          </article>
-
-          <article id="skills" className="card">
-            <div className="section-head">
-              <h2>{profileOptions.find((item) => item.key === profileFocus)?.label} Focus</h2>
-            </div>
-            <div className="tag-cloud">
-              {activeProfile.topSkills.map((skill) => (
-                <span key={skill}>
-                  <Check size={13} />
-                  {skill}
-                </span>
-              ))}
-            </div>
-            <div className="skill-groups">
-              <p><strong>{activeProfile.secondaryLabel}:</strong> {activeProfile.secondaryText}</p>
-              <p><strong>{activeProfile.exploringLabel}:</strong> {activeProfile.exploringText}</p>
-            </div>
-          </article>
-        </section>
-
-        <section id="about" className="section-block split">
-          <article className="card">
-            <div className="section-head">
-              <h2>Education</h2>
-            </div>
-            <p className="line-with-icon"><GraduationCap size={15} /> {education.degree}</p>
-            <p>{education.institution}</p>
-            <p className="chip">{education.period}</p>
-          </article>
-
-          <article className="card">
-            <div className="section-head">
-              <h2>Awards</h2>
-            </div>
-            <div className="stack">
-              {awards.map((award) => (
-                <div key={award.title} className="entry-line">
-                  <p className="line-with-icon"><Trophy size={14} /> {award.title}</p>
-                  <p className="chip">{award.period}</p>
-                  <p>{award.description}</p>
+                <div className="cta-row">
+                  <a href="#work" className="btn-primary">View Work</a>
+                  <a href="#contact" className="btn-secondary">Contact</a>
                 </div>
+              </div>
+
+              <div className="hero-visual" aria-hidden="true">
+                <img src="/profile.jpg" alt={`${personal.name} profile`} className="profile-image" />
+              </div>
+            </div>
+          </motion.section>
+
+          {/* ── METRICS STRIP
+               Container stays in DOM. Each item re-mounts (via key) on switch,
+               staggering via delay. No AnimatePresence = no layout disruption. ── */}
+          <section className="metrics-strip">
+            {activeProfile.stats.map((item, i) => (
+              <motion.div
+                key={item.value + profileFocus}
+                className="metric-item"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, ease: EASE, delay: i * 0.07 }}
+              >
+                <p className="metric-value">{item.value}</p>
+                <p className="metric-label">{item.label}</p>
+              </motion.div>
+            ))}
+          </section>
+
+          {/* ── SELECTED WORK
+               Container stays in DOM. Cards re-mount on switch via key,
+               stagger via delay. No AnimatePresence = no layout disruption. ── */}
+          <section id="work" className="section-block">
+            <motion.div className="section-head" {...fadeUp()}>
+              <h2>Selected Work</h2>
+            </motion.div>
+
+            <div className="grid grid-3">
+              {orderedProjects.map((project, i) => (
+                <motion.article
+                  key={project.slug + profileFocus}
+                  className="card project-card"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, ease: EASE, delay: i * 0.09 }}
+                >
+                  <div className="project-body">
+                    <p className="project-role">{project.role}</p>
+                    <h3>{project.title}</h3>
+                    <p className="project-outcome">{project.bullets[0]}</p>
+                    <ul>
+                      {project.bullets.slice(1, 3).map((bullet) => (
+                        <li key={bullet}>{bullet}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="project-footer">
+                    <div className="tag-row">
+                      {project.stack.slice(0, 4).map((tag) => (
+                        <span key={tag}>{tag}</span>
+                      ))}
+                    </div>
+                    <a href={`#${project.slug}`} className="project-link">
+                      Case study <ArrowUpRight size={13} />
+                    </a>
+                  </div>
+                </motion.article>
               ))}
             </div>
-          </article>
-        </section>
+          </section>
 
-        <section id="contact" className="section-block">
-          <article className="card contact-card">
-            <h2>Let’s build something useful.</h2>
-            <p>Open to backend engineering, data-intensive systems, and performance-focused roles.</p>
-            <div className="contact-grid">
-              <a href={`mailto:${personal.email}`} className="contact-link">
-                <Mail size={16} />
-                {personal.email}
-              </a>
-              <a href={`tel:${personal.phone.replace(/\s+/g, '')}`} className="contact-link">
-                <Phone size={16} />
-                {personal.phone}
-              </a>
-              <a href={personal.linkedin} className="contact-link" target="_blank" rel="noreferrer">
-                LinkedIn
-                <ArrowUpRight size={15} />
-              </a>
-              <a href={personal.github} className="contact-link" target="_blank" rel="noreferrer">
-                GitHub
-                <ArrowUpRight size={15} />
-              </a>
-            </div>
-          </article>
-        </section>
-      </main>
+          {/* ── EXPERIENCE + SKILLS
+               Cards scroll-reveal. Timeline rows slide in from left.
+               Skills content cross-fades on switch (small div, safe for AP). ── */}
+          <section id="experience" className="section-block split">
+            <motion.article className="card" {...fadeUp()}>
+              <div className="section-head">
+                <h2>Experience</h2>
+              </div>
+              <div className="stack">
+                {experience.map((item, i) => (
+                  <motion.div
+                    key={`${item.company}-${item.dates}`}
+                    className="timeline-row"
+                    initial={{ opacity: 0, x: -12 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.35, ease: EASE, delay: i * 0.12 }}
+                  >
+                    <p className="timeline-date">{item.dates}</p>
+                    <div className="timeline-content">
+                      <h3>{item.role}</h3>
+                      <p className="company-name">{item.company}</p>
+                      <ul>
+                        {item.bullets.slice(0, 3).map((bullet) => (
+                          <li key={bullet}>{bullet}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.article>
 
-      <footer className="page-footer">
-        <p>© {new Date().getFullYear()} {personal.name}</p>
-        <p>{personal.title}</p>
-      </footer>
+            <motion.article id="skills" className="card" {...fadeUp(0.1)}>
+              <div className="section-head">
+                <h2>{profileOptions.find((item) => item.key === profileFocus)?.label} Focus</h2>
+              </div>
+              {/* Skills div is small + inside a fixed card → AnimatePresence is safe here */}
+              <AnimatePresence mode="wait">
+                <motion.div key={profileFocus} className="skill-groups" {...SWITCH}>
+                  <div>
+                    <p className="skill-group-label">Core</p>
+                    <p className="skill-group-list">{activeProfile.topSkills.join(' · ')}</p>
+                  </div>
+                  <div>
+                    <p className="skill-group-label">{activeProfile.secondaryLabel}</p>
+                    <p className="skill-group-list">{activeProfile.secondaryText}</p>
+                  </div>
+                  <div>
+                    <p className="skill-group-label">{activeProfile.exploringLabel}</p>
+                    <p className="skill-group-list">{activeProfile.exploringText}</p>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </motion.article>
+          </section>
+
+          {/* ── EDUCATION + AWARDS: scroll reveal ── */}
+          <section id="about" className="section-block split">
+            <motion.article className="card" {...fadeUp()}>
+              <div className="section-head">
+                <h2>Education</h2>
+              </div>
+              <p className="line-with-icon"><GraduationCap size={15} /> {education.degree}</p>
+              <p style={{ marginTop: '0.4rem' }}>{education.institution}</p>
+              <p className="chip" style={{ marginTop: '0.6rem' }}>{education.period}</p>
+            </motion.article>
+
+            <motion.article className="card" {...fadeUp(0.1)}>
+              <div className="section-head">
+                <h2>Awards</h2>
+              </div>
+              <div className="stack">
+                {awards.map((award) => (
+                  <div key={award.title} className="entry-line">
+                    <p className="line-with-icon"><Trophy size={14} /> {award.title}</p>
+                    <p className="chip">{award.period}</p>
+                    <p>{award.description}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.article>
+          </section>
+
+          {/* ── CONTACT: scroll reveal ── */}
+          <section id="contact" className="section-block">
+            <motion.article className="card contact-card" {...fadeUp()}>
+              <h2>Let's build something useful.</h2>
+              <p style={{ marginTop: '0.4rem' }}>Open to backend engineering, data-intensive systems, and performance-focused roles.</p>
+              <div className="contact-grid">
+                <a href={`mailto:${personal.email}`} className="contact-link">
+                  <Mail size={16} />
+                  {personal.email}
+                </a>
+                <a href={`tel:${personal.phone.replace(/\s+/g, '')}`} className="contact-link">
+                  <Phone size={16} />
+                  {personal.phone}
+                </a>
+                <a href={personal.linkedin} className="contact-link" target="_blank" rel="noreferrer">
+                  LinkedIn
+                  <ArrowUpRight size={15} />
+                </a>
+                <a href={personal.github} className="contact-link" target="_blank" rel="noreferrer">
+                  GitHub
+                  <ArrowUpRight size={15} />
+                </a>
+              </div>
+            </motion.article>
+          </section>
+
+        </main>
+
+        <footer className="page-footer">
+          <p>© {new Date().getFullYear()} {personal.name}</p>
+          <p>{personal.title}</p>
+        </footer>
       </div>
     </div>
   );

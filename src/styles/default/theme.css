@@ -1,16 +1,17 @@
 .app-root.theme-default {
-  --bg: #f5f3ef;
-  --bg-alt: #ece7de;
-  --surface: rgba(252, 251, 248, 0.92);
-  --surface-strong: rgba(255, 254, 251, 0.98);
-  --line: rgba(128, 138, 151, 0.32);
-  --line-strong: rgba(80, 103, 128, 0.55);
-  --text: #22262b;
-  --muted: #5f6872;
-  --accent: #3f5468;
-  --accent-soft: rgba(63, 84, 104, 0.13);
-  --shadow: 0 10px 30px rgba(38, 52, 70, 0.08);
-  --tag-bg: rgba(63, 84, 104, 0.08);
+  --bg: #F7F6F2;
+  --bg-alt: #EFEDE8;
+  --surface: #FFFFFF;
+  --surface-strong: #FFFFFF;
+  --line: #E6E3DD;
+  --line-strong: #C8C4BC;
+  --text: #1B1B1B;
+  --muted: #66625C;
+  --muted-light: #9A958E;
+  --accent: #2F3A44;
+  --accent-soft: rgba(47, 58, 68, 0.1);
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --tag-bg: #F2F0EB;
 }
 
 body[data-theme='default'] {
@@ -38,7 +39,9 @@ body[data-theme='default'] {
 }
 
 .app-root.theme-default .btn-primary {
+  background: var(--accent);
   color: #fff;
+  border-color: transparent;
 }
 
 .app-root.theme-default .btn-primary,
@@ -47,18 +50,8 @@ body[data-theme='default'] {
   border-color: rgba(63, 84, 104, 0.52);
 }
 
-.app-root.theme-default .section-block {
+.app-root.theme-default .metrics-strip {
   background: rgba(244, 241, 235, 0.82);
-}
-
-.app-root.theme-default #work,
-.app-root.theme-default #about {
-  background: rgba(236, 239, 242, 0.82);
-}
-
-.app-root.theme-default #experience,
-.app-root.theme-default #contact {
-  background: rgba(244, 241, 235, 0.85);
 }
 
 .app-root.theme-default .contact-card {
