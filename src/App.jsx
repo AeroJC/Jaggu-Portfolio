@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   ArrowUpRight,
   BriefcaseBusiness,
@@ -10,8 +11,36 @@ import {
 } from 'lucide-react';
 import { portfolioData } from './data/portfolio';
 
+const themeOptions = [
+  { key: 'default', label: 'Default' },
+  { key: 'matrix', label: 'Matrix' },
+  { key: 'holographic', label: 'Holo' }
+];
+
+const profileOptions = [
+  { key: 'backend', label: 'Backend' },
+  { key: 'dotnet', label: '.NET' },
+  { key: 'database', label: 'Database' }
+];
+
 function App() {
-  const { personal, featuredProjects, experience, skills, education, awards } = portfolioData;
+  const { personal, featuredProjects, experience, education, awards } = portfolioData;
+  const [theme, setTheme] = useState(() => {
+    if (typeof window === 'undefined') {
+      return 'default';
+    }
+
+    const savedTheme = window.localStorage.getItem('portfolio-theme');
+    return themeOptions.some((item) => item.key === savedTheme) ? savedTheme : 'default';
+  });
+  const [profileFocus, setProfileFocus] = useState(() => {
+    if (typeof window === 'undefined') {
+      return 'backend';
+    }
+
+    const savedFocus = window.localStorage.getItem('portfolio-focus');
+    return profileOptions.some((item) => item.key === savedFocus) ? savedFocus : 'backend';
+  });
 
   const navItems = [
     { href: '#work', label: 'Work' },
@@ -21,34 +50,119 @@ function App() {
     { href: '#contact', label: 'Contact' }
   ];
 
-  const topSkills = skills.primary.slice(0, 5).map((item) => item.name);
+  const profileModes = {
+    backend: {
+      title: 'Software engineer focused on scalable backend platforms.',
+      subtitle: 'I build production-ready APIs and enterprise systems that stay fast, observable, and maintainable as complexity grows.',
+      stats: [
+        { value: '4+ yrs', label: 'Enterprise backend engineering' },
+        { value: '20s', label: 'SSRS report latency target achieved' },
+        { value: '500K+', label: 'Records processed in migration' }
+      ],
+      projectOrder: ['api-framework', 'ssrs-reporting', 'data-migration'],
+      topSkills: ['C# & .NET Core', 'ASP.NET Core', 'Entity Framework', 'REST APIs', 'Azure DevOps'],
+      secondaryLabel: 'Architecture focus',
+      secondaryText: 'API contracts · Integration reliability · Error handling · Observability',
+      exploringLabel: 'Next upgrades',
+      exploringText: '.NET 8 patterns · Clean architecture · AI-assisted development'
+    },
+    dotnet: {
+      title: '.NET engineer building high-performance enterprise applications.',
+      subtitle: 'From API modules to data-intensive workloads, I optimize .NET systems for speed, maintainability, and long-term product evolution.',
+      stats: [
+        { value: 'C#', label: 'Primary language for production systems' },
+        { value: '.NET Core', label: 'Core framework for backend modules' },
+        { value: '89%', label: 'Performance gain in reporting stack' }
+      ],
+      projectOrder: ['ssrs-reporting', 'api-framework', 'data-migration'],
+      topSkills: ['C# & .NET Core', 'ASP.NET Core', 'Entity Framework', 'SSRS & SSIS', 'JavaScript & jQuery'],
+      secondaryLabel: '.NET ecosystem',
+      secondaryText: 'ASP.NET APIs · Entity Framework optimization · Dependency patterns · Modular services',
+      exploringLabel: 'Current learning',
+      exploringText: '.NET 8 features · Azure Functions · Advanced profiling'
+    },
+    database: {
+      title: 'Data and SQL-focused engineer for high-volume enterprise workloads.',
+      subtitle: 'I design efficient data flows, optimize SQL-heavy modules, and deliver reliable migration/reporting pipelines at scale.',
+      stats: [
+        { value: '500K+', label: 'Records migrated with integrity checks' },
+        { value: '70%', label: 'Faster migration load time' },
+        { value: '3m → 20s', label: 'Report execution optimization' }
+      ],
+      projectOrder: ['data-migration', 'ssrs-reporting', 'api-framework'],
+      topSkills: ['SQL Server', 'SSRS & SSIS', 'Entity Framework', 'C# & .NET Core', 'REST APIs'],
+      secondaryLabel: 'Data focus',
+      secondaryText: 'Query tuning · Index strategy · ETL design · Data validation automation',
+      exploringLabel: 'Next upgrades',
+      exploringText: 'Advanced SQL optimization · Pipeline observability · Azure data services'
+    }
+  };
 
-  const impactStats = [
-    { value: '4+ yrs', label: 'Enterprise backend engineering' },
-    { value: '500K+', label: 'Records migrated via SSIS' },
-    { value: '89%', label: 'Report latency reduced' }
-  ];
+  const activeProfile = profileModes[profileFocus];
+  const orderedProjects = [...featuredProjects].sort(
+    (a, b) => activeProfile.projectOrder.indexOf(a.slug) - activeProfile.projectOrder.indexOf(b.slug)
+  );
+
+  useEffect(() => {
+    window.localStorage.setItem('portfolio-theme', theme);
+    document.body.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    window.localStorage.setItem('portfolio-focus', profileFocus);
+    document.body.setAttribute('data-focus', profileFocus);
+  }, [profileFocus]);
 
   return (
-    <div className="site-shell">
+    <div className={`app-root theme-${theme} focus-${profileFocus}`}>
+      <div className="site-shell">
+      <div className="fx-grid" aria-hidden="true" />
+      <div className="fx-glow fx-glow-a" aria-hidden="true" />
+      <div className="fx-glow fx-glow-b" aria-hidden="true" />
+
       <header className="top-nav">
         <a href="#top" className="logo-pill">{personal.name}</a>
-        <nav>
+        <nav className="main-links">
           {navItems.map((item) => (
             <a key={item.href} href={item.href}>{item.label}</a>
           ))}
         </nav>
+        <div className="theme-switcher" role="group" aria-label="Style selector">
+          {themeOptions.map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              className={`theme-btn ${theme === item.key ? 'active' : ''}`}
+              onClick={() => setTheme(item.key)}
+              aria-label={item.label}
+              title={item.label}
+            >
+              <span className={`theme-icon theme-icon-${item.key}`} aria-hidden="true" />
+            </button>
+          ))}
+        </div>
       </header>
+
+      <div className="profile-switcher" role="group" aria-label="Profile focus selector">
+        {profileOptions.map((item) => (
+          <button
+            key={item.key}
+            type="button"
+            className={`profile-btn ${profileFocus === item.key ? 'active' : ''}`}
+            onClick={() => setProfileFocus(item.key)}
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
 
       <main id="top" className="content-wrap">
         <section className="hero-block">
           <div className="hero-layout">
             <div className="hero-main">
               <p className="eyebrow">{personal.title}</p>
-              <h1>Software engineer focused on scalable .NET and data systems.</h1>
-              <p className="hero-copy">
-                I build backend platforms that are fast under load, reliable in production, and easy for teams to evolve.
-              </p>
+              <h1>{activeProfile.title}</h1>
+              <p className="hero-copy">{activeProfile.subtitle}</p>
               <div className="hero-meta">
                 <p><MapPin size={16} /> {personal.location}</p>
                 <p><BriefcaseBusiness size={16} /> {experience[0]?.company}</p>
@@ -67,7 +181,7 @@ function App() {
         </section>
 
         <section className="grid grid-3 metrics">
-          {impactStats.map((item) => (
+          {activeProfile.stats.map((item) => (
             <article key={item.value} className="card metric-card">
               <p className="metric-value">{item.value}</p>
               <p>{item.label}</p>
@@ -80,7 +194,7 @@ function App() {
             <h2>Selected Work</h2>
           </div>
           <div className="grid grid-3">
-            {featuredProjects.map((project) => (
+            {orderedProjects.map((project) => (
               <article key={project.slug} className="card project-card">
                 <p className="chip">{project.role}</p>
                 <h3>{project.title}</h3>
@@ -117,10 +231,10 @@ function App() {
 
           <article id="skills" className="card">
             <div className="section-head">
-              <h2>Skills</h2>
+              <h2>{profileOptions.find((item) => item.key === profileFocus)?.label} Focus</h2>
             </div>
             <div className="tag-cloud">
-              {topSkills.map((skill) => (
+              {activeProfile.topSkills.map((skill) => (
                 <span key={skill}>
                   <Check size={13} />
                   {skill}
@@ -128,8 +242,8 @@ function App() {
               ))}
             </div>
             <div className="skill-groups">
-              <p><strong>Secondary:</strong> {skills.secondary.map((skill) => skill.name).join(' · ')}</p>
-              <p><strong>Exploring:</strong> {skills.emerging.map((skill) => skill.name).join(' · ')}</p>
+              <p><strong>{activeProfile.secondaryLabel}:</strong> {activeProfile.secondaryText}</p>
+              <p><strong>{activeProfile.exploringLabel}:</strong> {activeProfile.exploringText}</p>
             </div>
           </article>
         </section>
@@ -190,6 +304,7 @@ function App() {
         <p>© {new Date().getFullYear()} {personal.name}</p>
         <p>{personal.title}</p>
       </footer>
+      </div>
     </div>
   );
 }

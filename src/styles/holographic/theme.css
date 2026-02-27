@@ -1,0 +1,174 @@
+.app-root.theme-holographic {
+  --bg: #070a14;
+  --bg-alt: #0b1222;
+  --surface: rgba(16, 26, 48, 0.55);
+  --surface-strong: rgba(22, 33, 58, 0.72);
+  --line: rgba(149, 179, 235, 0.26);
+  --line-strong: rgba(74, 222, 255, 0.58);
+  --text: #e6efff;
+  --muted: #a8b6d9;
+  --accent: #4adeff;
+  --accent-soft: rgba(74, 222, 255, 0.14);
+  --shadow: 0 14px 30px rgba(3, 8, 20, 0.45);
+  --tag-bg: rgba(74, 222, 255, 0.12);
+}
+
+.app-root.theme-holographic .logo-pill,
+.app-root.theme-holographic h1,
+.app-root.theme-holographic h2 {
+  letter-spacing: -0.028em;
+}
+
+body[data-theme='holographic'] {
+  background:
+    radial-gradient(circle at 14% 10%, rgba(74, 222, 255, 0.14), transparent 32%),
+    radial-gradient(circle at 86% 16%, rgba(168, 139, 250, 0.14), transparent 30%),
+    linear-gradient(165deg, #070a14 0%, #0b1222 52%, #090f1d 100%);
+}
+
+.app-root.theme-holographic .fx-grid {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(137, 166, 221, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(137, 166, 221, 0.08) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(circle at center, black 18%, transparent 88%);
+}
+
+.app-root.theme-holographic .fx-glow {
+  display: block;
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.app-root.theme-holographic .fx-glow-a {
+  width: 280px;
+  height: 280px;
+  left: -70px;
+  top: 8%;
+  background: rgba(74, 222, 255, 0.24);
+}
+
+.app-root.theme-holographic .fx-glow-b {
+  width: 320px;
+  height: 320px;
+  right: -90px;
+  top: 30%;
+  background: rgba(168, 139, 250, 0.2);
+}
+
+.app-root.theme-holographic .top-nav {
+  background: rgba(11, 18, 34, 0.72);
+  border-color: rgba(128, 159, 222, 0.33);
+}
+
+.app-root.theme-holographic .profile-btn.active,
+.app-root.theme-holographic .theme-btn.active {
+  border-color: rgba(74, 222, 255, 0.66);
+}
+
+.app-root.theme-holographic .hero-block,
+.app-root.theme-holographic .card,
+.app-root.theme-holographic .section-block {
+  backdrop-filter: blur(16px);
+}
+
+.app-root.theme-holographic .hero-block {
+  background: linear-gradient(145deg, rgba(16, 28, 52, 0.66), rgba(12, 20, 38, 0.78));
+}
+
+.app-root.theme-holographic .hero-block::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(74, 222, 255, 0.12), transparent 36%, rgba(168, 139, 250, 0.16));
+  pointer-events: none;
+}
+
+.app-root.theme-holographic .hero-layout {
+  grid-template-columns: clamp(150px, 22vw, 230px) minmax(0, 1fr);
+}
+
+.app-root.theme-holographic .hero-visual {
+  justify-self: start;
+  order: -1;
+}
+
+.app-root.theme-holographic .hero-visual {
+  border-color: rgba(74, 222, 255, 0.45);
+  box-shadow: 0 0 50px rgba(74, 222, 255, 0.2);
+  background: linear-gradient(160deg, rgba(74, 222, 255, 0.2), rgba(168, 139, 250, 0.24));
+}
+
+.app-root.theme-holographic .profile-image {
+  filter: saturate(0.95) contrast(1.03) brightness(0.9);
+}
+
+.app-root.theme-holographic .btn-primary {
+  color: #03111f;
+  background: linear-gradient(120deg, #4adeff, #7dd3fc);
+  box-shadow: 0 0 24px rgba(74, 222, 255, 0.28);
+}
+
+.app-root.theme-holographic .btn-secondary {
+  background: rgba(19, 32, 57, 0.75);
+}
+
+.app-root.theme-holographic .card {
+  background: linear-gradient(160deg, rgba(18, 30, 54, 0.74), rgba(14, 25, 45, 0.78));
+}
+
+.app-root.theme-holographic .card:hover {
+  box-shadow: 0 16px 36px rgba(7, 14, 29, 0.5), 0 0 28px rgba(74, 222, 255, 0.12);
+}
+
+.app-root.theme-holographic .tag-row span {
+  border-color: rgba(74, 222, 255, 0.4);
+  color: #bae7ff;
+}
+
+.app-root.theme-holographic .tag-cloud span {
+  border-color: rgba(125, 211, 252, 0.45);
+  color: #c9ecff;
+}
+
+.app-root.theme-holographic .section-block,
+.app-root.theme-holographic #work,
+.app-root.theme-holographic #experience,
+.app-root.theme-holographic #about,
+.app-root.theme-holographic #contact {
+  background: linear-gradient(160deg, rgba(14, 23, 42, 0.74), rgba(11, 18, 34, 0.82));
+}
+
+.app-root.theme-holographic .contact-card {
+  background: linear-gradient(145deg, rgba(17, 31, 56, 0.86), rgba(15, 24, 45, 0.92));
+}
+
+.app-root.theme-holographic .contact-link {
+  background: rgba(14, 24, 45, 0.75);
+}
+
+.app-root.theme-holographic .profile-switcher {
+  background: rgba(13, 22, 42, 0.55);
+  border: 1px solid rgba(113, 163, 247, 0.24);
+  border-radius: 999px;
+  padding: 0.26rem 0.38rem;
+}
+
+@media (max-width: 760px) {
+  .app-root.theme-holographic .hero-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .app-root.theme-holographic .hero-visual {
+    order: 0;
+    justify-self: start;
+  }
+}
