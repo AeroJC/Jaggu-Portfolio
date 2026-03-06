@@ -1,21 +1,49 @@
 @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap");
 
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
 :root {
+  /* ── colour ── */
   --bg: #f5f5f5;
   --bg-alt: #ebebeb;
   --surface: rgba(255, 255, 255, 0.85);
   --surface-strong: rgba(255, 255, 255, 0.95);
-  --line: rgba(0, 0, 0, 0.14);
-  --line-strong: rgba(0, 0, 0, 0.25);
+  --line: rgba(0, 0, 0, 0.13);
+  --line-strong: rgba(0, 0, 0, 0.24);
   --text: #111827;
   --muted: #4b5563;
   --accent: #0f172a;
   --accent-soft: rgba(15, 23, 42, 0.1);
   --radius: 16px;
-  --shadow: 0 10px 28px rgba(0, 0, 0, 0.1);
+  --radius-sm: 8px;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   --tag-bg: rgba(0, 0, 0, 0.06);
+  --muted-light: #9a958e; /* $text-muted — dates, labels, role text */
+
+  /* ── type scale (only these sizes are allowed) ── */
+  --fs-display: 48px;   /* hero h1          */
+  --fs-2xl:     24px;   /* section h2, stat */
+  --fs-lg:      18px;   /* card h3          */
+  --fs-base:    16px;   /* body             */
+  --fs-sm:      14px;   /* small body/meta  */
+  --fs-xs:      12px;   /* ALL mono labels  */
+
+  --lh-display: 54px;
+  --lh-2xl:     30px;
+  --lh-lg:      26px;
+  --lh-base:    26px;
+  --lh-sm:      22px;
+  --lh-xs:      18px;
+
+  /* ── active profile-chip ── */
+  --chip-active-bg:   var(--accent);
+  --chip-active-text: #fff;
 }
 
+/* ============================================================
+   RESET + BASE
+   ============================================================ */
 *,
 *::before,
 *::after {
@@ -30,6 +58,7 @@ body,
 }
 
 html {
+  font-size: 16px; /* anchor — never change; all rem values snap to this */
   scroll-behavior: smooth;
   scroll-padding-top: 5.5rem;
 }
@@ -50,18 +79,25 @@ a {
   min-height: 100vh;
 }
 
+/* ============================================================
+   CONTAINER
+   ============================================================ */
 .site-shell {
   position: relative;
-  width: min(1080px, calc(100% - 2rem));
+  width: min(1152px, calc(100% - 3rem));
   margin: 1rem auto 2rem;
   isolation: isolate;
 }
 
+/* FX elements (hidden in default, shown by themes) */
 .fx-grid,
 .fx-glow {
   display: none;
 }
 
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
 .top-nav {
   position: sticky;
   top: 0.8rem;
@@ -79,7 +115,7 @@ a {
 
 .logo-pill {
   color: var(--text);
-  font-size: 0.94rem;
+  font-size: var(--fs-lg);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
@@ -93,9 +129,9 @@ a {
 
 .main-links a {
   color: var(--muted);
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.8rem;
-  letter-spacing: 0.03em;
+  font-family: "Sora", sans-serif;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
   transition: color 200ms ease;
 }
 
@@ -154,12 +190,9 @@ a {
   border: 1px solid rgba(147, 197, 253, 0.85);
 }
 
-.content-wrap {
-  margin-top: 1rem;
-  display: grid;
-  gap: 1rem;
-}
-
+/* ============================================================
+   PROFILE SWITCHER
+   ============================================================ */
 .profile-switcher {
   margin-top: 0.7rem;
   display: inline-flex;
@@ -168,50 +201,73 @@ a {
 }
 
 .profile-btn {
+  position: relative;
   border: 1px solid var(--line);
   background: var(--surface-strong);
   color: var(--muted);
   border-radius: 999px;
   padding: 0.34rem 0.72rem;
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.72rem;
-  letter-spacing: 0.03em;
+  font-size: var(--fs-xs);
+  line-height: var(--lh-xs);
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: transform 200ms ease, border-color 200ms ease, color 200ms ease;
+  transition: border-color 200ms ease, color 200ms ease;
 }
 
 .profile-btn:hover {
-  transform: translateY(-1px);
   color: var(--text);
   border-color: var(--line-strong);
 }
 
 .profile-btn.active {
-  color: var(--text);
-  border-color: var(--line-strong);
-  box-shadow: 0 0 0 2px var(--accent-soft);
+  color: var(--chip-active-text);
+  border-color: transparent;
 }
 
-.hero-block,
-.card {
+/* Spring-animated background pill (framer-motion layoutId) */
+.profile-pill-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: var(--chip-active-bg);
+  z-index: 0;
+}
+
+/* Keep label above the pill */
+.profile-btn-label {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   CONTENT WRAP
+   ============================================================ */
+.content-wrap {
+  margin-top: 1.25rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero-block {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
   backdrop-filter: blur(8px);
 }
 
-.hero-block {
-  position: relative;
-  overflow: hidden;
-  padding: clamp(1.25rem, 4vw, 2.3rem);
-}
-
 .hero-layout {
   position: relative;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .hero-main {
@@ -220,9 +276,9 @@ a {
 
 .hero-visual {
   justify-self: end;
-  width: clamp(152px, 22vw, 236px);
+  width: clamp(140px, 20vw, 220px);
   aspect-ratio: 3 / 4;
-  border-radius: 22px;
+  border-radius: var(--radius);
   overflow: hidden;
   border: 1px solid var(--line);
   background: var(--surface-strong);
@@ -245,35 +301,43 @@ a {
   background: var(--accent-soft);
   color: var(--accent);
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.05em;
+  font-size: var(--fs-xs);
+  line-height: var(--lh-xs);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
 h1 {
   margin: 0.75rem 0 0.55rem;
   max-width: 18ch;
-  font-size: clamp(1.95rem, 5.4vw, 3.35rem);
-  line-height: 1.04;
+  font-size: var(--fs-display);
+  line-height: var(--lh-display);
   letter-spacing: -0.03em;
 }
 
 h2 {
   margin: 0;
-  font-size: clamp(1.05rem, 2vw, 1.35rem);
+  font-size: var(--fs-2xl);
+  line-height: var(--lh-2xl);
+  font-weight: 700;
   letter-spacing: -0.02em;
 }
 
 h3 {
-  margin: 0.45rem 0;
-  font-size: 1rem;
-  line-height: 1.35;
+  margin: 0;
+  font-size: var(--fs-lg);
+  line-height: var(--lh-lg);
+  font-weight: 600;
 }
 
 p {
   margin: 0;
   color: var(--muted);
-  line-height: 1.58;
+  font-size: var(--fs-base);
+  line-height: var(--lh-base);
 }
 
 h1,
@@ -305,7 +369,8 @@ strong,
   align-items: center;
   gap: 0.35rem;
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.8rem;
+  font-size: var(--fs-xs);
+  line-height: var(--lh-xs);
 }
 
 .hero-meta svg,
@@ -314,6 +379,9 @@ strong,
   color: var(--accent);
 }
 
+/* ============================================================
+   BUTTONS + CTA
+   ============================================================ */
 .cta-row {
   margin-top: 1rem;
   display: flex;
@@ -326,13 +394,13 @@ strong,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  padding: 0.58rem 0.95rem;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.8rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1.5rem;
+  font-family: "Sora", sans-serif;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+  font-weight: 500;
+  transition: transform 220ms ease, background 220ms ease, border-color 220ms ease;
 }
 
 .btn-primary {
@@ -352,21 +420,33 @@ strong,
   transform: translateY(-2px);
 }
 
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.contact-link:focus-visible,
+.main-links a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================================
+   SECTION BLOCKS (layout only — no visual surface)
+   ============================================================ */
 .section-block {
   display: grid;
   gap: 0.75rem;
-  padding: 0.9rem;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface);
 }
 
 .section-head {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
+  margin-bottom: 0.25rem;
 }
 
+/* ============================================================
+   GRID
+   ============================================================ */
 .grid {
   display: grid;
   gap: 0.75rem;
@@ -380,57 +460,152 @@ strong,
   grid-column: span 12;
 }
 
+/* ============================================================
+   CARDS (sole visual surface)
+   ============================================================ */
 .card {
-  padding: 1rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   background: var(--surface-strong);
   box-shadow: var(--shadow);
-  transition: transform 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
+  transition: border-color 200ms ease, background 200ms ease;
 }
 
 .card:hover {
-  transform: translateY(-3px);
   border-color: var(--line-strong);
 }
 
-.metric-card {
-  padding: 0.95rem 1rem;
+/* ============================================================
+   METRICS STRIP
+   ============================================================ */
+.metrics-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.metric-item {
+  padding: 1.25rem 1.5rem;
+  border-right: 1px solid var(--line);
+}
+
+.metric-item:last-child {
+  border-right: 0;
 }
 
 .metric-value {
-  color: var(--accent);
-  font-size: 1.35rem;
+  color: var(--text);
+  font-size: var(--fs-2xl);
+  line-height: var(--lh-2xl);
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.25rem;
 }
 
+.metric-label {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+  color: var(--muted);
+}
+
+/* ============================================================
+   CHIP
+   ============================================================ */
 .chip {
   display: inline-flex;
   width: fit-content;
-  margin-bottom: 0.28rem;
+  margin-bottom: 0.35rem;
   padding: 0.18rem 0.52rem;
   border-radius: 999px;
   border: 1px solid var(--line);
-  color: var(--muted);
+  background: var(--tag-bg);
+  color: var(--muted-light);
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.04em;
+  font-size: var(--fs-xs);
+  line-height: var(--lh-xs);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.card ul {
+/* ============================================================
+   PROJECT CARDS
+   ============================================================ */
+.project-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.project-body {
+  flex: 1;
+}
+
+.project-role {
+  margin: 0 0 0.4rem;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: var(--fs-xs);
+  line-height: var(--lh-xs);
+  color: var(--muted-light);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.project-outcome {
+  margin-top: 0.35rem;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+  color: var(--muted);
+}
+
+.project-card ul {
   margin: 0.5rem 0 0;
   padding-left: 1rem;
   display: grid;
   gap: 0.32rem;
 }
 
-.card li {
+.project-card li {
   color: var(--muted);
-  line-height: 1.45;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
 }
 
+.project-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.project-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: "Sora", sans-serif;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 150ms ease;
+}
+
+.project-link:hover {
+  opacity: 0.6;
+}
+
+/* ============================================================
+   TAG ROW
+   ============================================================ */
 .tag-row {
-  margin-top: 0.64rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem;
@@ -441,11 +616,15 @@ strong,
   border: 1px solid var(--line);
   background: var(--tag-bg);
   padding: 0.15rem 0.5rem;
-  color: var(--text);
+  color: var(--muted);
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-size: var(--fs-xs);
+  line-height: var(--lh-xs);
 }
 
+/* ============================================================
+   SPLIT LAYOUT (2-col grid)
+   ============================================================ */
 .split {
   grid-template-columns: repeat(12, minmax(0, 1fr));
 }
@@ -454,9 +633,96 @@ strong,
   grid-column: span 12;
 }
 
+/* ============================================================
+   TIMELINE (Experience entries)
+   ============================================================ */
 .stack {
   display: grid;
-  gap: 0.65rem;
+  gap: 1rem;
+}
+
+.timeline-row {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 0.5rem 1rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.timeline-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.timeline-date {
+  padding-top: 0.2rem;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: var(--fs-xs);
+  line-height: var(--lh-xs);
+  color: var(--muted-light);
+  letter-spacing: 0.08em;
+}
+
+.timeline-content {
+  display: grid;
+  gap: 0.3rem;
+}
+
+
+.company-name {
+  font-size: var(--fs-xs);
+  line-height: var(--lh-xs);
+  color: var(--muted-light);
+  font-family: "IBM Plex Mono", monospace;
+  letter-spacing: 0.08em;
+}
+
+.timeline-content ul {
+  margin: 0.3rem 0 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.timeline-content li {
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+}
+
+/* ============================================================
+   SKILL GROUPS
+   ============================================================ */
+.skill-groups {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.skill-group-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: var(--fs-xs);
+  line-height: var(--lh-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-light);
+  margin-bottom: 0.3rem;
+}
+
+.skill-group-list {
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+}
+
+/* ============================================================
+   EDUCATION / AWARDS (entry-line inside card)
+   ============================================================ */
+.line-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text);
+  font-weight: 600;
 }
 
 .entry-line {
@@ -471,46 +737,9 @@ strong,
   padding-bottom: 0;
 }
 
-.tag-cloud {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-}
-
-.tag-cloud span {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: var(--tag-bg);
-  padding: 0.23rem 0.52rem;
-  color: var(--text);
-  font-size: 0.78rem;
-}
-
-.skill-groups {
-  margin-top: 0.85rem;
-  display: grid;
-  gap: 0.55rem;
-}
-
-.skill-groups p {
-  font-size: 0.9rem;
-}
-
-.skill-groups strong {
-  color: var(--text);
-}
-
-.line-with-icon {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: var(--text);
-  font-weight: 600;
-}
-
+/* ============================================================
+   CONTACT
+   ============================================================ */
 .contact-grid {
   margin-top: 0.85rem;
   display: grid;
@@ -522,11 +751,12 @@ strong,
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--line);
-  background: var(--surface-strong);
-  padding: 0.58rem 0.72rem;
-  font-size: 0.88rem;
+  background: var(--tag-bg);
+  padding: 0.625rem 0.875rem;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
   color: var(--text);
   transition: border-color 220ms ease, background 220ms ease;
 }
@@ -535,8 +765,11 @@ strong,
   border-color: var(--line-strong);
 }
 
+/* ============================================================
+   FOOTER
+   ============================================================ */
 .page-footer {
-  margin-top: 0.85rem;
+  margin-top: 1rem;
   padding: 0 0.2rem;
   display: flex;
   justify-content: space-between;
@@ -545,14 +778,16 @@ strong,
 
 .page-footer p {
   color: var(--muted);
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.74rem;
-  letter-spacing: 0.02em;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
 }
 
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 @media (min-width: 760px) {
   .hero-layout {
-    grid-template-columns: minmax(0, 1fr) clamp(165px, 20vw, 240px);
+    grid-template-columns: minmax(0, 1fr) clamp(148px, 18vw, 220px);
     align-items: start;
   }
 
@@ -578,13 +813,44 @@ strong,
 }
 
 @media (max-width: 760px) {
+  .site-shell {
+    width: calc(100% - 2rem);
+  }
+
   .hero-visual {
     justify-self: start;
-    width: 142px;
+    width: 130px;
   }
 
   .top-nav {
     border-radius: 16px;
+  }
+
+  .metrics-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-item {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .metric-item:last-child {
+    border-bottom: 0;
+  }
+
+  .timeline-row {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+
+  .timeline-date {
+    padding-top: 0;
+  }
+
+  h1 {
+    font-size: 34px;
+    line-height: 40px;
   }
 
   .page-footer {

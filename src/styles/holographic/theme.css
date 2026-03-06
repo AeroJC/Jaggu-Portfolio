@@ -9,8 +9,10 @@
   --muted: #a8b6d9;
   --accent: #4adeff;
   --accent-soft: rgba(74, 222, 255, 0.14);
-  --shadow: 0 14px 30px rgba(3, 8, 20, 0.45);
+  --shadow: 0 4px 16px rgba(3, 8, 20, 0.3);
   --tag-bg: rgba(74, 222, 255, 0.12);
+  --chip-active-bg:   var(--accent);
+  --chip-active-text: #03111f;
 }
 
 .app-root.theme-holographic .logo-pill,
@@ -75,8 +77,7 @@ body[data-theme='holographic'] {
 }
 
 .app-root.theme-holographic .hero-block,
-.app-root.theme-holographic .card,
-.app-root.theme-holographic .section-block {
+.app-root.theme-holographic .card {
   backdrop-filter: blur(16px);
 }
 
@@ -99,9 +100,6 @@ body[data-theme='holographic'] {
 .app-root.theme-holographic .hero-visual {
   justify-self: start;
   order: -1;
-}
-
-.app-root.theme-holographic .hero-visual {
   border-color: rgba(74, 222, 255, 0.45);
   box-shadow: 0 0 50px rgba(74, 222, 255, 0.2);
   background: linear-gradient(160deg, rgba(74, 222, 255, 0.2), rgba(168, 139, 250, 0.24));
@@ -126,25 +124,17 @@ body[data-theme='holographic'] {
 }
 
 .app-root.theme-holographic .card:hover {
-  box-shadow: 0 16px 36px rgba(7, 14, 29, 0.5), 0 0 28px rgba(74, 222, 255, 0.12);
+  box-shadow: 0 0 28px rgba(74, 222, 255, 0.12);
+}
+
+.app-root.theme-holographic .metrics-strip {
+  backdrop-filter: blur(16px);
+  background: linear-gradient(160deg, rgba(14, 23, 42, 0.74), rgba(11, 18, 34, 0.82));
 }
 
 .app-root.theme-holographic .tag-row span {
   border-color: rgba(74, 222, 255, 0.4);
   color: #bae7ff;
-}
-
-.app-root.theme-holographic .tag-cloud span {
-  border-color: rgba(125, 211, 252, 0.45);
-  color: #c9ecff;
-}
-
-.app-root.theme-holographic .section-block,
-.app-root.theme-holographic #work,
-.app-root.theme-holographic #experience,
-.app-root.theme-holographic #about,
-.app-root.theme-holographic #contact {
-  background: linear-gradient(160deg, rgba(14, 23, 42, 0.74), rgba(11, 18, 34, 0.82));
 }
 
 .app-root.theme-holographic .contact-card {
